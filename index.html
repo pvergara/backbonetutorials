@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Backbone tutorials Beginner Video</title>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>User Management</h1>
+        <hr/>
+        <div class="page"></div>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js"></script>
+
+    <script type="text/template" id="user-list-template">
+        <table class="table stripped">
+            <thead>
+                <tr>
+                    <td>First name</td>
+                    <td>Last name</td>
+                    <td>Age</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                <%= hola %>
+            </tbody>
+        </table>
+    </script>
+
+    <script>
+        $.ajaxPrefilter(function (options) {
+            options.url = 'http://backbone-beginner.herokuapp.com' + options.url;
+        });
+
+        var Users = Backbone.Collection.extend({
+            url: '/users'
+        });
+
+        var UserList;
+        UserList = Backbone.View.extend({
+            el: '.page',
+            render: function () {
+                var users = new Users();
+                var that = this;
+                users.fetch({
+                    success: function (users) {
+                        var template = _.template(
+                            $("#user-list-template").html(),
+                            {users: users.models,hola: "caracola"}
+                        );
+                        that.$el.html(template);
+                    }
+                });
+            }
+        });
+
+
+        var Router = Backbone.Router.extend({
+            routes: {
+                '': 'home'
+            }
+        });
+
+        var userList = new UserList();
+
+        var router = new Router();
+
+        router.on('route:home', function () {
+//            console.log("We have loaded the home page.");
+            userList.render();
+        });
+
+        Backbone.history.start();
+    </script>
+</body>
+</html>
